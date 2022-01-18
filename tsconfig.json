@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "outDir": "./built",
+        "allowJs": true,
+        "target": "esnext",
+        "module": "commonjs",
+        "importHelpers": true,
+        "strict": true,
+        "moduleResolution": "node",
+        "watch": true,
+        "esModuleInterop": true,
+        "lib": [
+            "dom",
+        ],
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        }
+    }
+}
