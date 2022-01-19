@@ -1,9 +1,9 @@
 {
     "name": "YourStagmontASA",
     "version": "1.0.0",
-    "main": "server.js",
+    "main": "server.ts",
     "scripts": {
-        "start": "node built/server.js",
+        "start": "tsnode src/server.ts",
         "dev": "nodemon src/server.ts"
     },
     "license": "MIT",

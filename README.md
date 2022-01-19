@@ -1,6 +1,6 @@
 # YourStagmontASA
 
-`Your Stagmont ASA` tries to abstract Stagmont's [Camp Companion](https://i-zone.mobi/Companion/) into a user-friendly Telegram bot to mark parade states.
+`YourStagmontASA` is a Telegram bot for Stagmont's [Camp Companion](https://i-zone.mobi/Companion/). Powered by [Puppeteer](https://github.com/puppeteer/puppeteer), [Fastify](https://github.com/fastify/fastify), [Node](https://github.com/nodejs/node) and a few button presses, `YourStagmontASA` aims to be a simpler, faster and secure alternative to marking parade states.
 
 ## Setup
 
