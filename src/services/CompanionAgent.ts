@@ -6,8 +6,8 @@ interface StringDict {
 }
 
 export default class CompanionAgent {
-    browser: any | null
-    page: any | null
+    browser: any
+    page: any
     parade_state_url: string
     names_dict: StringDict
     completed: boolean
