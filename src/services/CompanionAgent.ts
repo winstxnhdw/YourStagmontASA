@@ -52,27 +52,36 @@ export default class CompanionAgent {
 
     async get_parade_state() {
         await this.page.goto('https://i-zone.mobi/InfoOntheGo/ParadeStateMarker.aspx')
-        await this.page.click('#Comp_Common_UI_wt2_block_wtMainContent_WebPatterns_wt16_block_wtContent_wtGetParadeStatesList_ctl00_wt15_wt1')
+        await this.wait_click('#Comp_Common_UI_wt2_block_wtMainContent_WebPatterns_wt16_block_wtContent_wtGetParadeStatesList_ctl00_wt15_wt1')
         await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
 
         this.parade_state_url = this.page.url()
-        await this.page.goto(`${this.parade_state_url.slice(0, -2)}21`)
-        await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
 
-        const names = await this.page.$$eval('span.Title.Bold', (els: any) => els.map((el: any) => el.innerHTML))
-        const user_details_urls = await this.page.$$eval('a', (els: any) =>
-            els.map((el: any) => el.href).filter((url: string) => url.includes('ParadeStateUserDetails.aspx?WasAO='))
-        )
+        for (let period_id = 18; period_id <= 21; period_id++) {
+            await this.page.goto(`${this.parade_state_url.slice(0, -2)}${period_id}`)
+            await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
 
-        names.forEach((name: string, idx: number) => {
-            const user_url = user_details_urls[idx]
-            const pattern = 'StateId='
-            const start_id = user_url.indexOf(pattern) + pattern.length
-            this.names_dict[name] = user_url.slice(start_id, start_id + 7)
-        })
+            const names = await this.page.$$eval('span.Title.Bold', (els: any) => els.map((el: any) => el.innerHTML))
 
-        console.log('Parade state information retrieved')
-        console.log(`Total strength: ${names.length}`)
+            const user_details_urls = await this.page.$$eval('a', (els: any) =>
+                els.map((el: any) => el.href).filter((url: string) => url.includes('ParadeStateUserDetails.aspx?WasAO='))
+            )
+
+            if (user_details_urls.length === 0) {
+                continue
+            }
+
+            names.forEach((name: string, idx: number) => {
+                const user_url = user_details_urls[idx]
+                const pattern = 'StateId='
+                const start_id = user_url.indexOf(pattern) + pattern.length
+                this.names_dict[name] = user_url.slice(start_id, start_id + 7)
+            })
+
+            console.log('Parade state information retrieved')
+            console.log(`Total strength: ${names.length}`)
+            break
+        }
     }
 
     async set_parade_state(absentees_dict: StringDict) {
@@ -150,7 +159,8 @@ export default class CompanionAgent {
     }
 
     async wait_click(selector: string) {
-        await this.page.$eval(selector, (button: any) => button.click())
+        await this.page.waitForSelector(selector)
+        await this.page.click(selector)
     }
 }
 
@@ -167,6 +177,7 @@ async function test() {
     await agent.get_parade_state()
     await agent.set_parade_state(absentee_dict)
     await agent.browser.close()
+    console.log('Test sucessfully completed')
 }
 
 test()
