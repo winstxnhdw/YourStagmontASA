@@ -6,13 +6,15 @@ interface StringDict {
 }
 
 export default class CompanionAgent {
-    browser: any
-    page: any
-    parade_state_url: string
-    names_dict: StringDict
-    completed: boolean
-    readonly user_agent: string
-    readonly period_id_dict: StringDict
+    private browser: any
+    private page: any
+
+    public parade_state_url: string
+    public names_dict: StringDict
+    public completed: boolean
+
+    private readonly user_agent: string
+    private readonly period_id_dict: StringDict
 
     constructor() {
         this.browser = null
@@ -28,7 +30,7 @@ export default class CompanionAgent {
         }
     }
 
-    async init() {
+    public async init() {
         this.browser = await puppeteer.launch({ headless: false })
         this.page = await this.browser.newPage()
         await this.page.setUserAgent(this.user_agent)
@@ -36,7 +38,7 @@ export default class CompanionAgent {
         console.log('New tab opened')
     }
 
-    async login(username: string, password: string) {
+    public async login(username: string, password: string) {
         if (this.page === null) {
             console.log('Page not initialised')
         }
@@ -50,7 +52,7 @@ export default class CompanionAgent {
         console.log(`Logged in as ${username}`)
     }
 
-    async get_parade_state() {
+    public async get_parade_state() {
         await this.page.goto('https://i-zone.mobi/InfoOntheGo/ParadeStateMarker.aspx')
         await this.wait_click('#Comp_Common_UI_wt2_block_wtMainContent_WebPatterns_wt16_block_wtContent_wtGetParadeStatesList_ctl00_wt15_wt1')
         await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
@@ -84,7 +86,7 @@ export default class CompanionAgent {
         }
     }
 
-    async set_parade_state(absentees_dict: StringDict) {
+    public async set_parade_state(absentees_dict: StringDict) {
         this.page.on('dialog', async (dialog: any) => {
             await dialog.accept()
         })
@@ -107,7 +109,7 @@ export default class CompanionAgent {
         this.completed = true
     }
 
-    async set_absent(name: string, remarks: string) {
+    private async set_absent(name: string, remarks: string) {
         await this.page.goto(`https://i-zone.mobi/InfoOntheGo/ParadeStateUserDetails.aspx?WasAO=False&ParadeStateId=${this.names_dict[name]}`)
         await this.wait_click('#Comp_Common_UI_wt3_block_wtMainContent_WebPatterns_wt5_block_wtContent_wtParadeStateStatusList_ctl28_wtModule')
 
@@ -124,7 +126,7 @@ export default class CompanionAgent {
         console.log(`Reason: ${remarks}`)
     }
 
-    async set_all_present(parade_url: string, period: string) {
+    private async set_all_present(parade_url: string, period: string) {
         await this.page.goto(parade_url)
         const present_btn_selector = '#Comp_Common_UI_wt9_block_wtMainContent_wtParadeStateUserList_wt46'
 
@@ -138,7 +140,7 @@ export default class CompanionAgent {
         return false
     }
 
-    async submit_parade_state(parade_url: string, period: string) {
+    private async submit_parade_state(parade_url: string, period: string) {
         await this.page.goto(parade_url)
         await this.wait_click('#Comp_Common_UI_wt9_block_wtActions_wtbtnSubmit')
         await this.page.waitForNavigation({ waitUntil: 'networkidle0' })
@@ -158,7 +160,7 @@ export default class CompanionAgent {
         return image_buffer
     }
 
-    async wait_click(selector: string) {
+    private async wait_click(selector: string) {
         await this.page.waitForSelector(selector)
         await this.page.click(selector)
     }
