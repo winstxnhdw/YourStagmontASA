@@ -109,6 +109,18 @@ export default class CompanionAgent {
         this.completed = true
     }
 
+    public async check_parade_state_status() {
+        let image_buffer = []
+
+        for (let period in this.period_id_dict) {
+            const parade_url = `${this.parade_state_url.slice(0, -2)}${this.period_id_dict[period]}`
+            await this.page.goto(parade_url)
+            image_buffer.push(await this.page.screenshot({ type: 'jpeg', quality: 100, fullPage: true }))
+        }
+
+        return image_buffer
+    }
+
     private async set_absent(name: string, remarks: string) {
         await this.page.goto(`https://i-zone.mobi/InfoOntheGo/ParadeStateUserDetails.aspx?WasAO=False&ParadeStateId=${this.names_dict[name]}`)
         await this.wait_click('#Comp_Common_UI_wt3_block_wtMainContent_WebPatterns_wt5_block_wtContent_wtParadeStateStatusList_ctl28_wtModule')
@@ -146,18 +158,6 @@ export default class CompanionAgent {
         await this.page.waitForNavigation({ waitUntil: 'networkidle0' })
 
         console.log(`${period} state submitted`)
-    }
-
-    async check_parade_state_status() {
-        let image_buffer = []
-
-        for (let period in this.period_id_dict) {
-            const parade_url = `${this.parade_state_url.slice(0, -2)}${this.period_id_dict[period]}`
-            await this.page.goto(parade_url)
-            image_buffer.push(await this.page.screenshot({ type: 'jpeg', quality: 100, fullPage: true }))
-        }
-
-        return image_buffer
     }
 
     private async wait_click(selector: string) {
