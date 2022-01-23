@@ -4,14 +4,16 @@
         "allowJs": true,
         "target": "esnext",
         "module": "commonjs",
-        "importHelpers": true,
-        "strict": true,
         "moduleResolution": "node",
+        "removeComments": true,
+        "importHelpers": true,
         "watch": true,
         "esModuleInterop": true,
-        "lib": [
-            "dom",
-        ],
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
         "paths": {
             "@/*": [
                 "./src/*"
