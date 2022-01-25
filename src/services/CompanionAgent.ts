@@ -6,8 +6,8 @@ interface StringDict {
 }
 
 export default class CompanionAgent {
-    private browser: puppeteer.Browser | undefined
-    private page: puppeteer.Page | undefined
+    private browser?: puppeteer.Browser
+    private page?: puppeteer.Page
 
     public parade_state_url: string
     public names_dict: StringDict
@@ -52,24 +52,19 @@ export default class CompanionAgent {
     }
 
     public async get_parade_state(): Promise<void> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        await this.page.goto('https://i-zone.mobi/InfoOntheGo/ParadeStateMarker.aspx')
+        await this.page!.goto('https://i-zone.mobi/InfoOntheGo/ParadeStateMarker.aspx')
         await this.wait_click('#Comp_Common_UI_wt2_block_wtMainContent_WebPatterns_wt16_block_wtContent_wtGetParadeStatesList_ctl00_wt15_wt1')
-        await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
+        await this.page!.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
 
-        this.parade_state_url = this.page.url()
+        this.parade_state_url = this.page!.url()
 
         for (let period_id = 18; period_id <= 21; period_id++) {
-            await this.page.goto(`${this.parade_state_url.slice(0, -2)}${period_id}`)
-            await this.page.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
+            await this.page!.goto(`${this.parade_state_url.slice(0, -2)}${period_id}`)
+            await this.page!.waitForSelector('#Comp_Common_UI_wt9_block_wtTitle')
 
-            const names = await this.page.$$eval('span.Title.Bold', (els: Element[]) => els.map((el: Element) => el.innerHTML))
+            const names = await this.page!.$$eval('span.Title.Bold', (els: Element[]) => els.map((el: Element) => el.innerHTML))
 
-            const user_details_urls = await this.page.$$eval('a', (els: Element[]) =>
+            const user_details_urls = await this.page!.$$eval('a', (els: Element[]) =>
                 els.map((el: any) => el.href).filter((url: string) => url.includes('ParadeStateUserDetails.aspx?WasAO='))
             )
 
@@ -91,14 +86,7 @@ export default class CompanionAgent {
     }
 
     public async set_parade_state(absentees_dict: StringDict): Promise<void> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        this.page.on('dialog', async (dialog: puppeteer.Dialog) => {
-            await dialog.accept()
-        })
+        this.page!.on('dialog', async (dialog: puppeteer.Dialog) => await dialog.accept())
 
         if (!(Object.keys(absentees_dict).length === 0)) {
             for (let absentee in absentees_dict) {
@@ -117,84 +105,62 @@ export default class CompanionAgent {
     }
 
     public async check_parade_state_status(): Promise<Array<string | Buffer> | undefined> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
         let image_buffer: Array<string | Buffer> = []
 
         for (let period in this.period_id_dict) {
             const parade_url = `${this.parade_state_url.slice(0, -2)}${this.period_id_dict[period]}`
-            await this.page.goto(parade_url)
-            image_buffer.push(await this.page.screenshot({ type: 'jpeg', quality: 100, fullPage: true }))
+            await this.page!.goto(parade_url)
+            image_buffer.push(await this.page!.screenshot({ type: 'jpeg', quality: 100, fullPage: true }))
         }
 
         return image_buffer
     }
 
     private async set_absent(name: string, remarks: string): Promise<void> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        await this.page.goto(`https://i-zone.mobi/InfoOntheGo/ParadeStateUserDetails.aspx?WasAO=False&ParadeStateId=${this.names_dict[name]}`)
+        await this.page!.goto(`https://i-zone.mobi/InfoOntheGo/ParadeStateUserDetails.aspx?WasAO=False&ParadeStateId=${this.names_dict[name]}`)
         await this.wait_click('#Comp_Common_UI_wt3_block_wtMainContent_WebPatterns_wt5_block_wtContent_wtParadeStateStatusList_ctl28_wtModule')
 
-        await this.page.waitForTimeout(500)
-        const remark_field_selector = '#Comp_Common_UI_wt3_block_wtMainContent_wtParadeStateAbsentee_Remarks'
-        await this.page.$eval(remark_field_selector, (el: any) => (el.value = ''))
-        await this.page.type(remark_field_selector, remarks)
+        await this.page!.waitForTimeout(500)
+
+        await this.page!.$eval(
+            '#Comp_Common_UI_wt3_block_wtMainContent_wtParadeStateAbsentee_Remarks',
+            (el: any, remarks: unknown) => (el.value = <string>remarks),
+            remarks
+        )
 
         await this.wait_click('#Comp_Common_UI_wt3_block_wtMainContent_wtParadeState_SetSubsequent')
         await this.wait_click('#Comp_Common_UI_wt3_block_wtMainContent_wtBtnApplyReason2')
-        await this.page.waitForNavigation({ waitUntil: 'networkidle0' })
+        await this.page!.waitForNavigation({ waitUntil: 'networkidle0' })
 
         console.log(`Setting ${name} as 'Absent'`)
         console.log(`Reason: ${remarks}`)
     }
 
     private async set_all_present(parade_url: string, period: string): Promise<boolean | undefined> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        await this.page.goto(parade_url)
+        await this.page!.goto(parade_url)
         const present_btn_selector = '#Comp_Common_UI_wt9_block_wtMainContent_wtParadeStateUserList_wt46'
 
-        if ((await this.page.$(present_btn_selector)) === null) {
+        if ((await this.page!.$(present_btn_selector)) === null) {
             console.log(`${period} state has already been submitted`)
             return true
         }
 
-        await this.page.click(present_btn_selector)
+        await this.page!.click(present_btn_selector)
         console.log(`Setting all to present for ${period}`)
         return false
     }
 
     private async submit_parade_state(parade_url: string, period: string): Promise<void> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        await this.page.goto(parade_url)
+        await this.page!.goto(parade_url)
         await this.wait_click('#Comp_Common_UI_wt9_block_wtActions_wtbtnSubmit')
-        await this.page.waitForNavigation({ waitUntil: 'networkidle0' })
+        await this.page!.waitForNavigation({ waitUntil: 'networkidle0' })
 
         console.log(`${period} state submitted`)
     }
 
     private async wait_click(selector: string): Promise<void> {
-        if (this.page === undefined) {
-            console.log('Page not initialised')
-            return
-        }
-
-        await this.page.waitForSelector(selector)
-        await this.page.click(selector)
+        await this.page!.waitForSelector(selector)
+        await this.page!.click(selector)
     }
 }
 
@@ -202,8 +168,7 @@ async function test() {
     const agent = new CompanionAgent()
 
     const absentee_dict = {
-        'REC ALPHONSUS CHUA YI CHEN': 'Cohorting',
-        'REC WINSTON HO DI WEI': 'MC'
+        'REC ALPHONSUS CHUA YI CHEN': 'Cohorting'
     }
 
     await agent.init()
