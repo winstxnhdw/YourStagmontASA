@@ -15,7 +15,7 @@ const leave_scene = (ctx: Scenes.WizardContext) => {
     return ctx.scene.leave()
 }
 
-const ask_username_step = (ctx: Scenes.WizardContext) => {
+const ask_username_step = (ctx: any) => {
     ctx.reply('Enter your username:')
     return ctx.wizard.next()
 }
@@ -41,6 +41,4 @@ get_password_step.on('text', async (ctx) => {
 get_username_step.command('cancel', (ctx: any) => leave_scene(ctx))
 get_password_step.command('cancel', (ctx: any) => leave_scene(ctx))
 
-export const login_scene = new Scenes.WizardScene('login_scene', (ctx: Scenes.WizardContext) => {
-    ask_username_step(ctx), get_username_step, get_password_step
-})
+export const login_scene = new Scenes.WizardScene('login_scene', ask_username_step, get_username_step, get_password_step)
