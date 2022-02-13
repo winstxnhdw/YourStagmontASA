@@ -1,15 +1,7 @@
 {
-<<<<<<< HEAD
   "semi": false,
   "singleQuote": true,
   "useTabs": false,
   "trailingComma": "none",
   "printWidth": 150
-=======
-    "semi": false,
-    "singleQuote": true,
-    "useTabs": false,
-    "trailingComma": "none",
-    "printWidth": 150
->>>>>>> 0b6baf031a6f5a34171e1aeb7423572e274b2ce8
 }
