@@ -1,12 +1,9 @@
 {
     "name": "YourStagmontASA",
     "version": "1.0.0",
-    "main": "server.ts",
     "scripts": {
-        "start": "tsnode src/server.ts",
         "dev": "nodemon src/server.ts"
     },
-    "license": "MIT",
     "dependencies": {
         "@types/node": "^17.0.9",
         "dotenv": "^12.0.4",
