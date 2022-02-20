@@ -1,5 +1,5 @@
 const start_msg = (name: string) => {
-    const msg = `
+  const msg = `
 Hello ${name}! I am your personal Stagmont Admin Support Assistant in the form of a Telegram bot.
 My current duties are to mark parade states as efficiently as possible!
 
@@ -7,7 +7,7 @@ You can send /login to begin the process. If at any point in time you feel lost,
 
 Created by @winsstooon
 `
-    return msg
+  return msg
 }
 
 export const help_msg = `
@@ -23,7 +23,7 @@ I am sorry, I don't understand that command. Remember that you can always send /
 `
 
 export module messages {
-    export const start = start_msg
-    export const help = help_msg
-    export const other = other_msg
+  export const start = start_msg
+  export const help = help_msg
+  export const other = other_msg
 }
