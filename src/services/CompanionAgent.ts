@@ -29,7 +29,7 @@ export default class CompanionAgent {
   }
 
   public async init(): Promise<void> {
-    this.browser = await puppeteer.launch({ headless: true })
+    this.browser = await puppeteer.launch({ headless: false })
     this.page = await this.browser.newPage()
     await this.page.setUserAgent(this.user_agent)
 
@@ -42,7 +42,7 @@ export default class CompanionAgent {
       return
     }
 
-    this.page.goto('https://i-zone.mobi/Companion/Login.aspx', { timeout: 5000 }).catch((error) => {
+    await this.page.goto('https://i-zone.mobi/Companion/Login.aspx', { timeout: 5000 }).catch((error) => {
       console.log('Unable to connect to the companion. Page may be undergoing maintanence.\n')
       throw error
     })
